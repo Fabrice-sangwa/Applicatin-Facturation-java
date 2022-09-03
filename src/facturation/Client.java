@@ -62,35 +62,7 @@ public class Client extends javax.swing.JFrame {
         }
 
     }
-    private void tableProd() {
-
-        try {
-            String elementP[] = {"Code", "Designation", "Prix", "Quante","Unite","TVA","PrixTotal"};
-            String[] ligne = new String[10];
-            DefaultTableModel model = new DefaultTableModel(null, elementP);
-
-           
-            
-            Statement stm = connection.connectbd().createStatement();
-            String requete = "SELECT *FROM produit";
-            ResultSet result = stm.executeQuery(requete);
-            while(result.next()){
-                ligne[0] =result.getString("codeProduit");
-                ligne[1] =result.getString("Designation");
-                ligne[2] =result.getString("Prix");
-                ligne[3] =result.getString("unite");
-                ligne[4] =result.getString("quantite");
-                ligne[5] =result.getString("tva");
-                ligne[6] =result.getString("prixTotal");
-                model.addRow(ligne);
-            }
-            tableaClent.setModel(model);
-        } catch (SQLException ex) {
-           // Logger.getLogger(Interface.class.getName()).log(Level.SEVERE, null, ex);
-        }  
-
-    }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -132,7 +104,7 @@ public class Client extends javax.swing.JFrame {
         setBackground(new java.awt.Color(0, 153, 153));
 
         jLabel1.setFont(new java.awt.Font("Bodoni MT", 0, 24)); // NOI18N
-        jLabel1.setText("FACTITURA BOUTIQUE");
+        jLabel1.setText("FACTITURA BOUTIQUE : CLIENTS");
 
         jLabel2.setBackground(new java.awt.Color(0, 255, 255));
         jLabel2.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
@@ -302,7 +274,7 @@ public class Client extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 100, Short.MAX_VALUE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(idtel, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -331,9 +303,9 @@ public class Client extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(46, 46, 46)
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(90, 90, 90)
                         .addComponent(jLabel1)
-                        .addGap(147, 147, 147)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)))
                 .addGap(48, 48, 48)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -348,7 +320,7 @@ public class Client extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel1)
-                        .addGap(44, 44, 44)
+                        .addGap(31, 31, 31)
                         .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(52, 52, 52)
@@ -435,10 +407,13 @@ public class Client extends javax.swing.JFrame {
                         "',  '" + idavenue.getText() +"',  '" + idnumero.getText() +  "')";
                     requetStatement.executeUpdate(commandesSql);
                     
-                        JOptionPane.showMessageDialog(null, "Insertion réussie");
+                    JOptionPane.showMessageDialog(null, "Insertion réussie");
             } catch (SQLException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
+            dispose();
+            Client clientFentre = new Client();
+            clientFentre.setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void idprenomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idprenomActionPerformed
@@ -463,7 +438,7 @@ public class Client extends javax.swing.JFrame {
             String numero = idnumero.getText();
             
             
-            // mise ajour du client
+            // suppresi
             String requete = "DELETE from client where Numero =? ";
             PreparedStatement stm = connection.connectbd().prepareStatement(requete);
             stm.setString(1, numero);

@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -23,6 +24,37 @@ public class Article extends javax.swing.JFrame {
         initComponents();
         setResizable(false);
         setLocationRelativeTo(null);
+        tableArticleSelect();
+    }
+    
+    private void tableArticleSelect() {
+
+        try {
+            String element[] = {"Code", "Designation", "Prix", "Unite", "DateExp", "Categorie"};
+            String[] ligne = new String[6];
+            DefaultTableModel model = new DefaultTableModel(null, element);
+
+            Statement stm = connection.connectbd().createStatement();
+            String requete = "SELECT * FROM article";
+            
+            ResultSet result = stm.executeQuery(requete);
+            
+            while(result.next()){
+                ligne[0] =result.getString("Code");
+                ligne[1] =result.getString("Designation");
+                ligne[2] =result.getString("Prix");
+                ligne[3] =result.getString("Unite");
+                ligne[4] =result.getString("DateExp");
+                ligne[5] =result.getString("Categorie");
+                model.addRow(ligne);
+                //JOptionPane.showMessageDialog(null,ligne);
+                
+            }
+            tableaarticle.setModel(model);
+        } catch (SQLException ex) {
+            //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     /**
@@ -41,8 +73,6 @@ public class Article extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         idCategorie = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tableArticles = new javax.swing.JTable();
         jLabel15 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
         jLabel17 = new javax.swing.JLabel();
@@ -57,6 +87,8 @@ public class Article extends javax.swing.JFrame {
         jButton14 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableaarticle = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -93,21 +125,6 @@ public class Article extends javax.swing.JFrame {
                 idCategorieActionPerformed(evt);
             }
         });
-
-        tableArticles.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
-            },
-            new String [] {
-                "Code", "Prix", "Quantité", "Désignation", "TVA", "Unité de Mesure"
-            }
-        ));
-        jScrollPane1.setViewportView(tableArticles);
 
         jLabel15.setBackground(new java.awt.Color(0, 255, 255));
         jLabel15.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
@@ -204,6 +221,27 @@ public class Article extends javax.swing.JFrame {
             }
         });
 
+        tableaarticle.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Code", "Designation", "Prix", "Unite", "Date d'exp", "Catégorie"
+            }
+        ));
+        tableaarticle.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableaarticleMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tableaarticle);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -242,7 +280,7 @@ public class Article extends javax.swing.JFrame {
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(82, 82, 82)
                         .addComponent(jLabel13)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -252,9 +290,9 @@ public class Article extends javax.swing.JFrame {
                             .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(74, 74, 74))))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(11, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 928, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -301,9 +339,9 @@ public class Article extends javax.swing.JFrame {
                     .addComponent(jButton12)
                     .addComponent(jButton14)
                     .addComponent(jButton10))
-                .addGap(26, 26, 26)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(9, 9, 9))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -337,7 +375,37 @@ public class Article extends javax.swing.JFrame {
     }//GEN-LAST:event_idCategorieActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel dm = (DefaultTableModel) tableaarticle.getModel();
+        int selectIndex = tableaarticle.getSelectedRow();
+        
+        try {
+            
+            String code = idCode.getText();
+            String designation = idDesignation.getText();
+            Double prix = Double.parseDouble(idPrix.getText());
+            String unite = IdUnite.getText();
+            String date = idDateExp.getText();
+            String categorie = idCategorie.getText();
+            
+            
+            
+            // mise ajour du client
+            String requete = "UPDATE article SET Code =?, Designation =?, Prix =?, Unite =?, DateExp =?, Categorie =? where Code =?";
+            PreparedStatement stm = connection.connectbd().prepareStatement(requete);
+            stm.setString(1, code);
+            stm.setString(2, designation);
+            stm.setDouble(3, prix);
+            stm.setString(4, unite);
+            stm.setString(5, date);
+            stm.setString(6, categorie);
+            stm.setString(7, code);
+            stm.executeUpdate();
+            tableArticleSelect();
+            
+            JOptionPane.showMessageDialog(null, "Article mis à jour");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -354,6 +422,9 @@ public class Article extends javax.swing.JFrame {
             } catch (SQLException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+        dispose();
+        Article articleFenetre = new Article();
+        articleFenetre.setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void idDateExpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idDateExpActionPerformed
@@ -391,8 +462,40 @@ public class Article extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel dm = (DefaultTableModel) tableaarticle.getModel();
+        int selectIndex = tableaarticle.getSelectedRow();
+        
+        try {
+            
+            String code = idCode.getText();
+            
+            
+            
+            // suppresi
+            String requete = "DELETE from article where Code =? ";
+            PreparedStatement stm = connection.connectbd().prepareStatement(requete);
+            stm.setString(1,code);
+            stm.executeUpdate();
+            tableArticleSelect();
+            
+            JOptionPane.showMessageDialog(null, "Article supprimé");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
     }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void tableaarticleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableaarticleMouseClicked
+        DefaultTableModel dm = (DefaultTableModel) tableaarticle.getModel();
+        int selectIndex = tableaarticle.getSelectedRow();
+        
+        idCode.setText(dm.getValueAt(selectIndex,0).toString());
+        idDesignation.setText(dm.getValueAt(selectIndex, 1).toString());
+        idPrix.setText(dm.getValueAt(selectIndex,2).toString());
+        IdUnite.setText(dm.getValueAt(selectIndex, 3).toString());
+        idDateExp.setText(dm.getValueAt(selectIndex, 4).toString());
+        idCategorie.setText(dm.getValueAt(selectIndex, 5).toString());
+        
+    }//GEN-LAST:event_tableaarticleMouseClicked
 
     /**
      * @param args the command line arguments
@@ -478,6 +581,6 @@ public class Article extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
-    private javax.swing.JTable tableArticles;
+    private javax.swing.JTable tableaarticle;
     // End of variables declaration//GEN-END:variables
 }
