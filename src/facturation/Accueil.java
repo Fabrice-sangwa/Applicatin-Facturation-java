@@ -16,6 +16,8 @@ public class Accueil extends javax.swing.JFrame {
      */
     public Accueil() {
         initComponents();
+        setResizable(false);
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -161,7 +163,7 @@ public class Accueil extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         this.dispose();
-        Facture articlefenetre = new Facture();
+        Article articlefenetre = new Article();
         articlefenetre.setVisible(true);
         
                 
@@ -172,11 +174,16 @@ public class Accueil extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        // TODO add your handling code here:
+            this.dispose();  
+            Historique historiquefenetre = new Historique();
+            historiquefenetre.setVisible(true);
+            
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        // TODO add your handling code here:
+           this.dispose();
+           Facture facturefenetre = new Facture();
+           facturefenetre.setVisible(true);
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
@@ -184,7 +191,9 @@ public class Accueil extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
-        // TODO add your handling code here:
+           this.dispose();
+           Client clientfentre = new Client();
+           clientfentre.setVisible(true);
     }//GEN-LAST:event_jButton14ActionPerformed
 
     /**
