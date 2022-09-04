@@ -278,7 +278,7 @@ public class Article extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(82, 82, 82)
+                        .addGap(94, 94, 94)
                         .addComponent(jLabel13)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -401,7 +401,7 @@ public class Article extends javax.swing.JFrame {
             stm.setString(7, code);
             stm.executeUpdate();
             tableArticleSelect();
-            
+            //System.out.println(stm);
             JOptionPane.showMessageDialog(null, "Article mis à jour");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -474,6 +474,7 @@ public class Article extends javax.swing.JFrame {
             // suppresi
             String requete = "DELETE from article where Code =? ";
             PreparedStatement stm = connection.connectbd().prepareStatement(requete);
+            
             stm.setString(1,code);
             stm.executeUpdate();
             tableArticleSelect();

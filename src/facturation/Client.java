@@ -38,7 +38,7 @@ public class Client extends javax.swing.JFrame {
             DefaultTableModel model = new DefaultTableModel(null, element);
 
             Statement stm = connection.connectbd().createStatement();
-            String requete = "SELECT * FROM client";
+            String requete = "SELECT * FROM client ";
            
             ResultSet result = stm.executeQuery(requete);
             

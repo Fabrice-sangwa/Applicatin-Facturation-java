@@ -5,6 +5,10 @@ import javax.swing.JOptionPane;
 
 public class connection {
 
+    static PreparedStatement connectbd(String select__from_article_WHERE_Designation_) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     Connection conn = null;
 
     public static Connection connectbd() {
