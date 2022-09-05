@@ -54,37 +54,29 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="124" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jButton10" min="-2" pref="87" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="156" max="-2" attributes="0"/>
-                                  <Component id="jButton14" min="-2" pref="86" max="-2" attributes="0"/>
-                              </Group>
+                          <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jButton12" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="idCode" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
-                                              <Component id="jLabel14" alignment="0" min="-2" pref="84" max="-2" attributes="0"/>
-                                              <Component id="idPrix" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
-                                              <Component id="jLabel17" alignment="0" min="-2" pref="85" max="-2" attributes="0"/>
-                                              <Component id="idDateExp" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
-                                              <Component id="jLabel20" min="-2" pref="164" max="-2" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace min="-2" pref="97" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="jLabel15" alignment="0" min="-2" pref="84" max="-2" attributes="0"/>
-                                              <Component id="idDesignation" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
-                                              <Component id="idCategorie" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
-                                              <Component id="IdUnite" min="-2" pref="231" max="-2" attributes="0"/>
-                                              <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jLabel18" min="-2" pref="84" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="idCode" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
+                                      <Component id="jLabel14" alignment="0" min="-2" pref="84" max="-2" attributes="0"/>
+                                      <Component id="idPrix" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
+                                      <Component id="jLabel17" alignment="0" min="-2" pref="85" max="-2" attributes="0"/>
+                                      <Component id="idDateExp" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
+                                      <Component id="jLabel20" min="-2" pref="164" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
+                              <Component id="jButton10" alignment="0" min="-2" pref="87" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="97" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jButton14" min="-2" pref="86" max="-2" attributes="0"/>
+                              <Component id="jLabel15" alignment="0" min="-2" pref="84" max="-2" attributes="0"/>
+                              <Component id="idDesignation" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
+                              <Component id="idCategorie" alignment="0" min="-2" pref="231" max="-2" attributes="0"/>
+                              <Component id="IdUnite" min="-2" pref="231" max="-2" attributes="0"/>
+                              <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel18" min="-2" pref="84" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -167,7 +159,6 @@
                   </Group>
                   <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jButton12" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton14" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton10" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -347,21 +338,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton14ActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="jButton12">
-          <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="66" red="0" type="rgb"/>
-            </Property>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Bodoni MT" size="14" style="0"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Historique"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton12ActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButton9">

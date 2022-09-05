@@ -5,7 +5,11 @@
  */
 package facturation;
 
+import java.awt.Graphics;
+import java.awt.PrintJob;
+import java.awt.Toolkit;
 import java.sql.*;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -21,120 +25,133 @@ public class Facture extends javax.swing.JFrame {
         initComponents();
         setResizable(false);
         setLocationRelativeTo(null);
+        initialisationTable();
         
 
     }
     
-    String element[] = {"Designation", "Prix", "Quantité", "TVA", "sous total"};
-    String[] ligne = new String[5];
+    String element[] = {"Designation", "Prix", "Quantité", "sous total"};
+    String[] ligne = new String[4];
     DefaultTableModel model = new DefaultTableModel(null, element);
     
     
+    Double total = 0.0;
     
-    
-   private void remplissagArticle(){
+   private void initialisationTable(){
        
-      
-       
-        String article  = idDesignationArticle.getText();
-       
-        try {
-            
-            String elements[] = {"Code", "Client", "Total", "TVA", "Net à payer"};
-            String[] lignes = new String[5];
-            DefaultTableModel modelT = new DefaultTableModel(null, element);
-            Double total = 0.0; 
-            Double tvaTotal = 0.0;
-            
-            String requete = "SELECT * FROM article where Designation=?";
-            PreparedStatement stm = connection.connectbd().prepareStatement(requete);
-            stm.setString(1, String.valueOf(article));
-            ResultSet result = stm.executeQuery();
-           
-            //System.out.println(stm);
-            
-            
-            while(result.next()){
-                ligne[0] =result.getString("Designation");
-                ligne[1] =result.getString("Prix");
-                double prix = Double.parseDouble(ligne[1]);
-                String qte = idQauntite.getText();
-                int quantite;
-                if (qte.isEmpty()){
-                    quantite = 0;
-                }else {
-                     quantite = Integer.parseInt(qte);
-                }
-                Double sousTotal = prix * quantite;
-                double tva = prix * 0.16;
-                sousTotal = prix +  tva;
-                total += sousTotal;
-                tvaTotal += tva;
-                ligne[2] = Integer.toString(quantite);
-                ligne[3] = "$ " + String.valueOf(tva);
-                ligne[4] = "$ " + String.valueOf(sousTotal);
-                
-                idPrixFacture.setText(ligne[1]);
-                idTvaFacture.setText(ligne[3]);
-                
-                
-                
-                
-                
-                model.addRow(ligne);
-                
-                //JOptionPane.showMessageDialog(null,ligne);
-                
-            }
-                lignes[0] = idCodeFacture.getText();
-                lignes[1] = idClientFacture.getText();
-                lignes[2] = String.valueOf(total);
-                lignes[3] = String.valueOf(tvaTotal);
-                lignes[4] = String.valueOf(total + tvaTotal);
-                tableauArticleFacture.setModel(model);
-                modelT.addRow(lignes);
-                tableauApayerFacture.setModel(modelT);
-            
-            /*
-
+           try{ 
+               
             Statement stm = connection.connectbd().createStatement();
-            String requete = "SELECT * FROM article where Designation='a' ";
             
+            
+            Statement stmdlt = connection.connectbd().createStatement();
+            String requetedelete = "DELETE FROM `facturetemp`";
+            stmdlt.executeUpdate(requetedelete);
+            
+            String requete = "SELECT * FROM facturetemp";
             ResultSet result = stm.executeQuery(requete);
             
             while(result.next()){
                 ligne[0] =result.getString("Designation");
                 ligne[1] =result.getString("Prix");
-                double prix = Double.parseDouble(ligne[1]);
-                String qte = idQauntite.getText();
-                int quantite;
-                if (qte.isEmpty()){
-                    quantite = 0;
-                }else {
-                     quantite = Integer.parseInt(qte);
-                }
-                Double sousTotal = prix * quantite;
-                double tva = prix * 0.16;
-                sousTotal = prix +  tva;
-                ligne[2] = Integer.toString(quantite);
-                ligne[3] = "$ " + String.valueOf(tva);
-                ligne[4] = "$ " + String.valueOf(sousTotal);
+                ligne[2] =result.getString("Quantite");
+                ligne[3] = String.valueOf(0.0);
                 
-                idPrixFacture.setText(ligne[1]);
-                idTvaFacture.setText(ligne[3]);
                 model.addRow(ligne);
                 //JOptionPane.showMessageDialog(null,ligne);
                 
             }
-            tableauArticleFacture.setModel(model);*/
+            tableauArticleFacture.setModel(model);
         } catch (SQLException ex) {
             //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+   }
+   private void remplissagArticle(){
        
-            
+     
        
+        String article  = idDesignationArticle.getText(); 
+        if(article.isEmpty()){
+            JOptionPane.showMessageDialog(null, "L'article n'existe pas ou n'a pas été renseigné");
+        } else {
+            try {
+                
+                
+                //Declaration du tablau des totaux de la facture
+                String elements[] = {"Code", "Client", "Total", "TVA", "TTC"};
+                String[] lignes = new String[5];
+                DefaultTableModel modelT = new DefaultTableModel(null, elements);
+                
+                 //on recherche dans la base de donnée le prix de l'article saisi
+                String requete = "SELECT * FROM article where Designation=?";
+                Double tva = 0.0;
+                
+                PreparedStatement stm = connection.connectbd().prepareStatement(requete);
+                stm.setString(1, String.valueOf(article));
+                ResultSet result = stm.executeQuery();
+           
+                
+                
+              
+                
+            while(result.next()){
+                ligne[0] =result.getString("Designation");
+                ligne[1] =result.getString("Prix");
+                double prix = Double.parseDouble(ligne[1]);
+                String qte = idQuantite.getText();
+                int quantite;
+                if (qte.isEmpty() || qte.contains("char")){
+                    
+                    //quantite = 0;
+                    JOptionPane.showMessageDialog(null, "Veuillez renseigner correstement la quantité ");
+                    break;
+                }else {
+                     quantite = Integer.parseInt(qte);
+                }
+                Double sousTotal = prix * quantite;
+                total += sousTotal;
+                tva = total * 0.16;
+                
+                ligne[2] = Integer.toString(quantite);
+                ligne[3] = "$ " + String.valueOf(sousTotal);
+                
+                idPrixFacture.setText(ligne[1]);
+                idTvaFacture.setText(String.valueOf(tva));
+                
+                model.addRow(ligne);
+                tableauArticleFacture.setModel(model);
+                //JOptionPane.showMessageDialog(null,ligne);
+                
+                if (idClientFacture.getText().isEmpty() || idClientFacture.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Veuillez renseigner le code de la facture et le nom du client ");
+                    dispose();
+                    Facture fenetreFacture = new  Facture();
+                    fenetreFacture.setVisible(true);
+                } else {
+                lignes[0] = idCodeFacture.getText();
+                lignes[1] = idClientFacture.getText();
+                lignes[2] = String.valueOf(total);
+                lignes[3] = String.valueOf(tva);
+                lignes[4] = String.valueOf(total + tva );
+                
+                modelT.addRow(lignes);
+                tableauApayerFacture.setModel(modelT);
+                Statement requetStatement = connection.connectbd().createStatement();
+                String commandesSql = "insert into facturetemp(Designation, Prix, Quantite) " +
+                        "Values('" + ligne[0] + "', '" + prix + "',  '" + quantite + "')";
+                requetStatement.executeUpdate(commandesSql);
+                
+                }
+                
+            }
+                        //JOptionPane.showMessageDialog(null, "Insertion réussie");
+            } catch (SQLException ex) {
+                //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+         
+        
             
            
        
@@ -154,10 +171,6 @@ public class Facture extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jButton7 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        idCodeFacture = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         idClientFacture = new javax.swing.JTextField();
@@ -166,19 +179,21 @@ public class Facture extends javax.swing.JFrame {
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         idPrixFacture = new javax.swing.JLabel();
-        idQuantiteFacture = new javax.swing.JLabel();
+        Jtext8 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         idTvaFacture = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tableauApayerFacture = new javax.swing.JTable();
-        idQauntite = new javax.swing.JTextField();
+        idQuantite = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
+        jButton14 = new javax.swing.JButton();
+        idCodeFacture = new javax.swing.JTextField();
+        jpanelimpro = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tableauArticleFacture = new javax.swing.JTable();
         jLabel26 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jButton12 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
-        jButton14 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableauApayerFacture = new javax.swing.JTable();
+        jButton6 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -199,39 +214,6 @@ public class Facture extends javax.swing.JFrame {
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
-            }
-        });
-
-        jButton2.setBackground(new java.awt.Color(255, 153, 51));
-        jButton2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jButton2.setText("Modifier");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        jButton3.setBackground(new java.awt.Color(255, 51, 51));
-        jButton3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jButton3.setText("Supprimer");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
-        jButton5.setBackground(new java.awt.Color(255, 153, 51));
-        jButton5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jButton5.setText("Imprimer");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-
-        idCodeFacture.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                idCodeFactureActionPerformed(evt);
             }
         });
 
@@ -265,15 +247,15 @@ public class Facture extends javax.swing.JFrame {
 
         jLabel19.setBackground(new java.awt.Color(0, 255, 255));
         jLabel19.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
-        jLabel19.setText("Désignatin de l'article");
+        jLabel19.setText("Désignation de l'article");
 
         idPrixFacture.setBackground(new java.awt.Color(0, 255, 255));
         idPrixFacture.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
-        idPrixFacture.setText("14");
+        idPrixFacture.setText("0.00");
 
-        idQuantiteFacture.setBackground(new java.awt.Color(0, 255, 255));
-        idQuantiteFacture.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
-        idQuantiteFacture.setText("Quantité");
+        Jtext8.setBackground(new java.awt.Color(0, 255, 255));
+        Jtext8.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
+        Jtext8.setText("Quantité");
 
         jLabel22.setBackground(new java.awt.Color(0, 255, 255));
         jLabel22.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
@@ -283,71 +265,24 @@ public class Facture extends javax.swing.JFrame {
         idTvaFacture.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
         idTvaFacture.setText("0.00");
 
-        tableauApayerFacture.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "Code", "Client", "Total ", "TVA", "Net à payer"
-            }
-        ));
-        jScrollPane1.setViewportView(tableauApayerFacture);
-
-        idQauntite.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
+        idQuantite.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
             public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
-                idQauntiteAncestorMoved(evt);
+                idQuantiteAncestorMoved(evt);
             }
             public void ancestorResized(java.awt.event.HierarchyEvent evt) {
             }
         });
-        idQauntite.addActionListener(new java.awt.event.ActionListener() {
+        idQuantite.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                idQauntiteActionPerformed(evt);
+                idQuantiteActionPerformed(evt);
             }
         });
-
-        tableauArticleFacture.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "Designation", "Prix", "Quantité", "TVA", "Sous Total"
-            }
-        ));
-        jScrollPane2.setViewportView(tableauArticleFacture);
-
-        jLabel26.setBackground(new java.awt.Color(0, 255, 255));
-        jLabel26.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
-        jLabel26.setText("A PAYER");
 
         jLabel13.setFont(new java.awt.Font("Bodoni MT", 0, 24)); // NOI18N
         jLabel13.setText("FACTITURA BOUTIQUE : Facture");
 
-        jButton12.setBackground(new java.awt.Color(0, 102, 255));
-        jButton12.setFont(new java.awt.Font("Bodoni MT", 0, 14)); // NOI18N
-        jButton12.setText("Historique");
-        jButton12.setToolTipText("");
-        jButton12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton12ActionPerformed(evt);
-            }
-        });
-
-        jButton10.setBackground(new java.awt.Color(255, 204, 0));
-        jButton10.setFont(new java.awt.Font("Bodoni MT", 0, 14)); // NOI18N
-        jButton10.setText("Facture");
-        jButton10.setToolTipText("");
-        jButton10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton10ActionPerformed(evt);
-            }
-        });
-
         jButton14.setBackground(new java.awt.Color(102, 255, 51));
-        jButton14.setFont(new java.awt.Font("Bodoni MT", 0, 14)); // NOI18N
+        jButton14.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
         jButton14.setText("Clients");
         jButton14.setToolTipText("");
         jButton14.addActionListener(new java.awt.event.ActionListener() {
@@ -356,26 +291,115 @@ public class Facture extends javax.swing.JFrame {
             }
         });
 
+        idCodeFacture.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                idCodeFactureActionPerformed(evt);
+            }
+        });
+
+        jpanelimpro.setBackground(new java.awt.Color(0, 153, 153));
+
+        tableauArticleFacture.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Designation", "Prix", "Quantité", "Sous Total"
+            }
+        ));
+        tableauArticleFacture.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableauArticleFactureMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tableauArticleFacture);
+
+        jLabel26.setBackground(new java.awt.Color(0, 255, 255));
+        jLabel26.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
+        jLabel26.setText("A PAYER");
+
+        tableauApayerFacture.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Code", "Client", "Total ", "TVA", "TTC"
+            }
+        ));
+        jScrollPane1.setViewportView(tableauApayerFacture);
+
+        javax.swing.GroupLayout jpanelimproLayout = new javax.swing.GroupLayout(jpanelimpro);
+        jpanelimpro.setLayout(jpanelimproLayout);
+        jpanelimproLayout.setHorizontalGroup(
+            jpanelimproLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpanelimproLayout.createSequentialGroup()
+                .addGroup(jpanelimproLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jpanelimproLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jpanelimproLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE))
+                        .addGroup(jpanelimproLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jScrollPane2)))
+                    .addGroup(jpanelimproLayout.createSequentialGroup()
+                        .addGap(266, 266, 266)
+                        .addComponent(jLabel26)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jpanelimproLayout.setVerticalGroup(
+            jpanelimproLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpanelimproLayout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jButton6.setBackground(new java.awt.Color(0, 153, 153));
+        jButton6.setFont(new java.awt.Font("Bodoni MT", 0, 18)); // NOI18N
+        jButton6.setText("Articles");
+        jButton6.setToolTipText("");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        jButton5.setBackground(new java.awt.Color(255, 153, 51));
+        jButton5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jButton5.setText("Imprimer");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(100, 100, 100)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 588, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 588, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(idQauntite, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(idQuantiteFacture, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel18, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel13)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(idQuantite, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(110, 110, 110)
+                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(Jtext8, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(108, 108, 108)
+                                .addComponent(jLabel13))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jpanelimpro, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(idDesignationArticle, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -395,57 +419,41 @@ public class Facture extends javax.swing.JFrame {
                                             .addGap(46, 46, 46)
                                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addComponent(idTvaFacture, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(138, 138, 138))))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton3)
-                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton12)
-                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addGap(103, 103, 103)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(27, 27, 27))
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(374, 374, 374)
-                    .addComponent(jLabel26)
-                    .addContainerGap(431, Short.MAX_VALUE)))
+                        .addContainerGap()
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(265, 265, 265)
+                        .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(135, 135, 135)
+                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(125, 125, 125)
+                        .addComponent(jButton6)
+                        .addGap(123, 123, 123)
+                        .addComponent(jButton5)))
+                .addContainerGap(50, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(33, Short.MAX_VALUE)
                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(jButton12))
-                .addGap(44, 44, 44)
-                .addComponent(jButton14)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel13)
+                .addGap(65, 65, 65)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(idCodeFacture, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(idClientFacture, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jButton10)))
-                .addGap(13, 13, 13)
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(idClientFacture, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(idCodeFacture, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28)
                 .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -456,46 +464,32 @@ public class Facture extends javax.swing.JFrame {
                     .addComponent(idPrixFacture, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(idTvaFacture, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(idQuantiteFacture, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(Jtext8, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(idQauntite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(72, 72, 72)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton4)
-                        .addGap(51, 51, 51)
-                        .addComponent(jButton2))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(70, 70, 70)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton5)))
-                .addGap(23, 23, 23))
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                    .addContainerGap(589, Short.MAX_VALUE)
-                    .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(105, 105, 105)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(idQuantite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4))
+                .addGap(45, 45, 45)
+                .addComponent(jpanelimpro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton6)
+                    .addComponent(jButton5)
+                    .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -511,22 +505,6 @@ public class Facture extends javax.swing.JFrame {
         remplissagArticle();
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-       
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-      
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
-
-    private void idCodeFactureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idCodeFactureActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_idCodeFactureActionPerformed
-
     private void idClientFactureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idClientFactureActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_idClientFactureActionPerformed
@@ -535,32 +513,65 @@ public class Facture extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_idDesignationArticleActionPerformed
 
-    private void idQauntiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idQauntiteActionPerformed
+    private void idQuantiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idQuantiteActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_idQauntiteActionPerformed
+    }//GEN-LAST:event_idQuantiteActionPerformed
 
-    private void idQauntiteAncestorMoved(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_idQauntiteAncestorMoved
+    private void idQuantiteAncestorMoved(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_idQuantiteAncestorMoved
         
-    }//GEN-LAST:event_idQauntiteAncestorMoved
-
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        dispose();
-        Historique historiqueFentre = new Historique();
-        historiqueFentre.setVisible(true);
-
-    }//GEN-LAST:event_jButton12ActionPerformed
-
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        this.dispose();
-        Facture factureFenetre = new Facture();
-        factureFenetre.setVisible(true);
-    }//GEN-LAST:event_jButton10ActionPerformed
+    }//GEN-LAST:event_idQuantiteAncestorMoved
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
         dispose();
         Client clientFenetre = new Client();
         clientFenetre.setVisible(true);
     }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void idCodeFactureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idCodeFactureActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_idCodeFactureActionPerformed
+
+    private void tableauArticleFactureMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableauArticleFactureMouseClicked
+        DefaultTableModel dm = (DefaultTableModel) tableauArticleFacture.getModel();
+        int selectIndex = tableauArticleFacture.getSelectedRow();
+        
+        idDesignationArticle.setText(dm.getValueAt(selectIndex,0).toString());
+        idPrixFacture.setText(dm.getValueAt(selectIndex,1).toString());
+        idQuantite.setText(dm.getValueAt(selectIndex, 2).toString());
+        
+       
+       try {
+            String selctrqt = "SELECT * FROM facturetemp where Designation=?";
+                PreparedStatement stmslc = connection.connectbd().prepareStatement(selctrqt);
+                stmslc.setString(1,idDesignationArticle.getText());
+                
+                ResultSet resultslc = stmslc.executeQuery();
+                while(resultslc.next()){
+                    String qte = resultslc.getString("Quantite");
+                }
+        } catch (Exception e) {
+        }
+        
+    }//GEN-LAST:event_tableauArticleFactureMouseClicked
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        this.dispose();
+        Article articlefenetre = new Article();
+        articlefenetre.setVisible(true);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        PrintJob print = kit.getPrintJob(this, "Impression", null);
+        Graphics gr = print.getGraphics();
+        jpanelimpro.printAll(gr);
+        print.end();
+        
+        this.dispose();
+        Article articlefenetre = new Article();
+        articlefenetre.setVisible(true);
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -598,20 +609,17 @@ public class Facture extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Jtext8;
     private javax.swing.JTextField idClientFacture;
     private javax.swing.JTextField idCodeFacture;
     private javax.swing.JTextField idDesignationArticle;
     private javax.swing.JLabel idPrixFacture;
-    private javax.swing.JTextField idQauntite;
-    private javax.swing.JLabel idQuantiteFacture;
+    private javax.swing.JTextField idQuantite;
     private javax.swing.JLabel idTvaFacture;
-    private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
@@ -624,6 +632,7 @@ public class Facture extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPanel jpanelimpro;
     private javax.swing.JTable tableauApayerFacture;
     private javax.swing.JTable tableauArticleFacture;
     // End of variables declaration//GEN-END:variables
